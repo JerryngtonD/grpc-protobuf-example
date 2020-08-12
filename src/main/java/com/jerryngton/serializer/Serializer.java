@@ -1,5 +1,6 @@
 package com.jerryngton.serializer;
 
+import com.google.protobuf.util.JsonFormat;
 import com.jerryngton.protobuf.pb.Laptop;
 
 import java.io.FileInputStream;
@@ -18,6 +19,25 @@ public class Serializer {
         Laptop laptop = Laptop.parseFrom(inStream);
         inStream.close();
         return laptop;
+    }
+
+    public void writeJSONFile(Laptop laptop, String filename) throws IOException {
+        JsonFormat.Printer printer = JsonFormat.printer()
+                .includingDefaultValueFields()
+                .preservingProtoFieldNames();
+
+        String jsonString = printer.print(laptop);
+
+        FileOutputStream outputStream = new FileOutputStream(filename);
+        outputStream.write(jsonString.getBytes());
+        outputStream.close();
+    }
+
+    public static void main(String[] args) throws IOException {
+        Serializer serializer = new Serializer();
+        Laptop laptop = serializer.readBinaryFile("laptop.bin");
+
+        serializer.writeJSONFile(laptop, "laptop.json");
     }
 
 

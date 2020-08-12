@@ -1,0 +1,53 @@
+{
+  "id": "",
+  "brand": "Dell",
+  "name": "Latitude",
+  "cpu": {
+    "brand": "Amd",
+    "name": "AMD Studio",
+    "number_cores": 6,
+    "number_threads": 11,
+    "min_ghz": 2.535860466754415,
+    "max_ghz": 4.911634259656138
+  },
+  "gpus": [{
+    "brand": "NVIDIA, AMD",
+    "name": "CLEAR GONE 2200",
+    "min_ghz": 2.9551633973870612,
+    "max_ghz": 3.9289797298445976,
+    "memory": {
+      "value": "5",
+      "unit": "GIGABYTE"
+    }
+  }],
+  "storages": [{
+    "driver": "SSD",
+    "memory": {
+      "value": "1021",
+      "unit": "GIGABYTE"
+    }
+  }, {
+    "driver": "HDD",
+    "memory": {
+      "value": "590",
+      "unit": "GIGABYTE"
+    }
+  }],
+  "screen": {
+    "size_inch": 15.008114,
+    "resolution": {
+      "width": 5756,
+      "height": 3238
+    },
+    "panel": "OLED",
+    "multitouch": true
+  },
+  "keyboard": {
+    "layout": "QWERTZ",
+    "backlit": false
+  },
+  "weight_kg": 2.92074978426647,
+  "price_usd": 1651.1546480493278,
+  "release_year": 2016,
+  "updated_at": "2020-08-12T08:40:34.512323Z"
+}
