@@ -18,7 +18,6 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
 
     @Override
     public void createLaptop(CreateLaptopRequest request, StreamObserver<CreateLaptopResponse> responseObserver) {
-        super.createLaptop(request, responseObserver);
         Laptop laptop = request.getLaptop();
         String id = laptop.getId();
 
@@ -35,8 +34,8 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
                         Status.INVALID_ARGUMENT
                         .withDescription(e.getMessage())
                         .asRuntimeException());
+                return;
             }
-            return;
         }
 
         Laptop other = laptop.toBuilder().setId(uuid.toString()).build();
@@ -65,6 +64,8 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+
+        logger.info("The laptop with this id was succesfully saved to the store: " + other.getId());
     }
 
     @Override
