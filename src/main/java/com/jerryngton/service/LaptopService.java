@@ -10,6 +10,12 @@ import java.util.logging.Logger;
 public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
     public static final Logger logger = Logger.getLogger(LaptopService.class.getName());
 
+    private LaptopStore store;
+
+    public LaptopService(LaptopStore store) {
+        this.store = store;
+    }
+
     @Override
     public void createLaptop(CreateLaptopRequest request, StreamObserver<CreateLaptopResponse> responseObserver) {
         super.createLaptop(request, responseObserver);
@@ -34,9 +40,31 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
         }
 
         Laptop other = laptop.toBuilder().setId(uuid.toString()).build();
-        //TODO: Save other laptop to in-memory store
 
+        try {
+            store.save(other);
+        } catch (AlreadyExistsException e) {
+            responseObserver.onError(
+                    Status.ALREADY_EXISTS
+                            .withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseObserver.onError(
+                    Status.INTERNAL
+                            .withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+            return;
+        }
 
+        CreateLaptopResponse response = CreateLaptopResponse.newBuilder()
+                .setId(other.getId())
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
