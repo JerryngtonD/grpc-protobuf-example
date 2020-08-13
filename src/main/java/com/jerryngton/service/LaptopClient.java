@@ -35,7 +35,7 @@ public class LaptopClient {
         CreateLaptopResponse response = CreateLaptopResponse.getDefaultInstance();
 
         try {
-            response = blockingStub.createLaptop(request);
+            response = blockingStub.withDeadlineAfter(5, TimeUnit.SECONDS).createLaptop(request);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "request failed: " + e.getMessage());
             return;

@@ -1,10 +1,12 @@
 package com.jerryngton.service;
 
 import com.jerryngton.protobuf.pb.*;
+import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
@@ -36,6 +38,24 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
                         .asRuntimeException());
                 return;
             }
+        }
+
+        //heavy processing
+        try {
+            TimeUnit.SECONDS.sleep(6);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //check cancelation from client cause deadline
+        if (Context.current().isCancelled()) {
+            logger.info("request is cancelled");
+            responseObserver.onError(
+                    Status.CANCELLED
+                            .withDescription("request is cancelled")
+                            .asRuntimeException()
+            );
+            return;
         }
 
         Laptop other = laptop.toBuilder().setId(uuid.toString()).build();
