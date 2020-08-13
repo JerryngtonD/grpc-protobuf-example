@@ -48,15 +48,15 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
         }
 
         //check cancelation from client cause deadline
-        if (Context.current().isCancelled()) {
-            logger.info("request is cancelled");
-            responseObserver.onError(
-                    Status.CANCELLED
-                            .withDescription("request is cancelled")
-                            .asRuntimeException()
-            );
-            return;
-        }
+//        if (Context.current().isCancelled()) {
+//            logger.info("request is cancelled");
+//            responseObserver.onError(
+//                    Status.CANCELLED
+//                            .withDescription("request is cancelled")
+//                            .asRuntimeException()
+//            );
+//            return;
+//        }
 
         Laptop other = laptop.toBuilder().setId(uuid.toString()).build();
 
