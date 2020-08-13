@@ -1,7 +1,6 @@
 package com.jerryngton.service;
 
 import com.jerryngton.protobuf.pb.*;
-import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
@@ -90,16 +89,16 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
 
     @Override
     public void searchLaptop(SearchLaptopRequest request, StreamObserver<SearchLaptopResponse> responseObserver) {
-        super.searchLaptop(request, responseObserver);
-    }
+        Filter filter = request.getFilter();
+        logger.info("got a search-laptop request with filter: " + filter);
 
-    @Override
-    public StreamObserver<UploadImageRequest> uploadImage(StreamObserver<UploadImageResponse> responseObserver) {
-        return super.uploadImage(responseObserver);
-    }
+        store.search(filter, laptop -> {
+            logger.info("found laptop with ID: " + laptop.getId());
+            var response = SearchLaptopResponse.newBuilder().setLaptop(laptop).build();
+            responseObserver.onNext(response);
+        });
 
-    @Override
-    public StreamObserver<RateLaptopRequest> rateLaptop(StreamObserver<RateLaptopResponse> responseObserver) {
-        return super.rateLaptop(responseObserver);
+        responseObserver.onCompleted();
+        logger.info("search laptops completed");
     }
 }
