@@ -4,13 +4,15 @@ import com.jerryngton.pcbook.sample.Generator;
 import com.jerryngton.protobuf.pb.CreateLaptopRequest;
 import com.jerryngton.protobuf.pb.LaptopServiceGrpc;
 import io.grpc.ManagedChannel;
+import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.testing.GrpcCleanupRule;
 import org.junit.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.util.UUID;
+
+import static org.junit.Assert.*;
 
 public class LaptopServerTest {
     @Rule
@@ -39,7 +41,7 @@ public class LaptopServerTest {
     }
 
     @Test
-    public void createLaptopWithValidUUID() {
+    public void createLaptopWithValidId() {
         var generator = new Generator();
         var laptop = generator.NewLaptop();
         var request = CreateLaptopRequest.newBuilder().setLaptop(laptop).build();
@@ -52,5 +54,42 @@ public class LaptopServerTest {
 
         var found = store.find(response.getId());
         assertNotNull(found);
+    }
+
+    @Test
+    public void createLaptopWithEmptyId() {
+        var generator = new Generator();
+        var laptop = generator.NewLaptop().toBuilder().setId("").build();
+        var request = CreateLaptopRequest.newBuilder().setLaptop(laptop).build();
+
+        var blockingStub = LaptopServiceGrpc.newBlockingStub(channel);
+        var response = blockingStub.createLaptop(request);
+
+        assertNotNull(response);
+        assertFalse(response.getId().isEmpty());
+
+        var found = store.find(response.getId());
+        assertNotNull(found);
+    }
+
+    @Test(expected = StatusRuntimeException.class)
+    public void createLaptopWithInvalidId() {
+        var generator = new Generator();
+        var laptop = generator.NewLaptop().toBuilder().setId("not-uuid-type").build();
+        var request = CreateLaptopRequest.newBuilder().setLaptop(laptop).build();
+
+        var blockingStub = LaptopServiceGrpc.newBlockingStub(channel);
+        var response = blockingStub.createLaptop(request);
+    }
+
+    @Test(expected = StatusRuntimeException.class)
+    public void createLaptopWithAlreadyExistsId() throws Exception {
+        var generator = new Generator();
+        var id = UUID.randomUUID().toString();
+        var laptop = generator.NewLaptop().toBuilder().setId(id).build();
+        store.save(laptop);
+        var request = CreateLaptopRequest.newBuilder().setLaptop(laptop).build();
+        var blockingStub = LaptopServiceGrpc.newBlockingStub(channel);
+        blockingStub.createLaptop(request);
     }
 }
