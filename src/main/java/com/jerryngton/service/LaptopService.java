@@ -1,6 +1,7 @@
 package com.jerryngton.service;
 
 import com.jerryngton.protobuf.pb.*;
+import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
@@ -40,22 +41,22 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
         }
 
         //heavy processing
-        try {
-            TimeUnit.SECONDS.sleep(6);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            TimeUnit.SECONDS.sleep(6);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         //check cancelation from client cause deadline
-//        if (Context.current().isCancelled()) {
-//            logger.info("request is cancelled");
-//            responseObserver.onError(
-//                    Status.CANCELLED
-//                            .withDescription("request is cancelled")
-//                            .asRuntimeException()
-//            );
-//            return;
-//        }
+        if (Context.current().isCancelled()) {
+            logger.info("request is cancelled");
+            responseObserver.onError(
+                    Status.CANCELLED
+                            .withDescription("request is cancelled")
+                            .asRuntimeException()
+            );
+            return;
+        }
 
         Laptop other = laptop.toBuilder().setId(uuid.toString()).build();
 
@@ -92,7 +93,7 @@ public class LaptopService extends LaptopServiceGrpc.LaptopServiceImplBase {
         Filter filter = request.getFilter();
         logger.info("got a search-laptop request with filter: " + filter);
 
-        store.search(filter, laptop -> {
+        store.search(Context.current(), filter, laptop -> {
             logger.info("found laptop with ID: " + laptop.getId());
             var response = SearchLaptopResponse.newBuilder().setLaptop(laptop).build();
             responseObserver.onNext(response);

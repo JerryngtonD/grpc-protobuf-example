@@ -133,7 +133,7 @@ public class Generator {
         String name = randomLaptopName(brand);
 
         double weightKg = randomDouble(1.0, 3.0);
-        double priceUSD = randomDouble(1500, 3500);
+        double priceUSD = randomDouble(2000, 3500);
 
         int releaseYear = randomInt(2015, 2019);
 
